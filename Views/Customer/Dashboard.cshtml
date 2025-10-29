@@ -1,0 +1,138 @@
+@{
+    ViewData["Title"] = "Dashboard";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+    var success = ViewBag.SuccessCount ?? 0;
+    var failed = ViewBag.FailCount ?? 0;
+    var barData = ViewBag.BarData as List<dynamic>;
+    var pieData = ViewBag.PieData as List<dynamic>;
+
+    // Thời gian cập nhật (bạn có thể lấy từ DB hoặc để DateTime.Now)
+    var lastUpdate = DateTime.Now.ToString("HH:mm");
+}
+
+<div class="container-fluid px-4">
+    <h4 class="mt-4">Xin chào <strong></strong></h4>
+
+    <div class="row">
+        <!-- Cột thống kê + bar chart -->
+        <div class="col-md-8">
+            <div class="card shadow-sm mb-4">
+                <div class="card-header d-flex justify-content-between align-items-center">
+                    <h5 class="mb-0"><i class="fas fa-chart-bar"></i> THỐNG KÊ ĐƠN HÀNG</h5>
+                    <form method="get" class="d-flex">
+                        <input type="date" name="fromDate" class="form-control form-control-sm me-2" 
+                               value="@Context.Request.Query["fromDate"]" />
+                        <input type="date" name="toDate" class="form-control form-control-sm me-2" 
+                               value="@Context.Request.Query["toDate"]" />
+                        <button class="btn btn-sm btn-outline-primary">Lọc</button>
+                    </form>
+                </div>
+                <div class="card-body">
+                    <p>
+                        Giao thành công: 
+                        <strong class="text-success">
+                            @success (@(success + failed == 0 ? 0 : (success * 100 / (success + failed)))%)
+                        </strong>
+                    </p>
+                    <p>Đã hoàn: <strong class="text-danger">@failed</strong></p>
+                    <canvas id="barChart" height="120"></canvas>
+                </div>
+            </div>
+        </div>
+
+        <!-- Cột pie chart -->
+        <div class="col-md-4">
+            <div class="card shadow-sm mb-4">
+                <div class="card-header d-flex justify-content-between align-items-center">
+                    <h5 class="mb-0"><i class="fas fa-chart-pie"></i> TOP 10 SẢN LƯỢNG</h5>
+                    <small class="text-muted">Cập nhật lần cuối lúc @lastUpdate</small>
+                </div>
+                <div class="card-body d-flex">
+                    <!-- Pie chart -->
+                    <div class="flex-grow-1">
+                        <canvas id="pieChart" height="220"></canvas>
+                    </div>
+
+                    <!-- Custom legend -->
+                    <div class="ms-3" style="font-size: 13px; max-height:220px; overflow-y:auto;">
+                        <ul id="pieLegend" class="list-unstyled mb-0"></ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script>
+        // ==== BAR CHART ====
+        const barCtx = document.getElementById('barChart').getContext('2d');
+        new Chart(barCtx, {
+            type: 'bar',
+            data: {
+                labels: @Html.Raw(Json.Serialize(barData?.Select(b => "Tháng " + b.Month))),
+                datasets: [
+                    {
+                        label: 'Giao thành công',
+                        data: @Html.Raw(Json.Serialize(barData?.Select(b => b.Count))),
+                        backgroundColor: '#00a65a'
+                    },
+                    {
+                        label: 'Đã hoàn',
+                        data: @Html.Raw(Json.Serialize(barData?.Select(b => b.FailCount ?? 0))),
+                        backgroundColor: '#f56954'
+                    }
+                ]
+            },
+            options: {
+                responsive: true,
+                plugins: { legend: { position: 'bottom' } }
+            }
+        });
+
+        // ==== PIE CHART + LEGEND ====
+        let provinces = @Html.Raw(Json.Serialize(pieData?.Select(p => p.Province)));
+        let counts = @Html.Raw(Json.Serialize(pieData?.Select(p => p.Count)));
+
+        // Gom thành mảng [{province, count}]
+        let data = provinces.map((p, i) => ({ province: p, count: counts[i] }));
+
+        // Sắp xếp giảm dần và lấy top 10
+        data.sort((a, b) => b.count - a.count);
+        data = data.slice(0, 10);
+
+        const colors = [
+            '#00c0ef','#f39c12','#00a65a','#f56954','#3c8dbc',
+            '#ff6384','#36a2eb','#9966ff','#ff9f40','#d2d6de'
+        ];
+
+        const pieCtx = document.getElementById('pieChart').getContext('2d');
+        new Chart(pieCtx, {
+            type: 'pie',
+            data: {
+                labels: data.map(d => d.province),
+                datasets: [{
+                    data: data.map(d => d.count),
+                    backgroundColor: colors
+                }]
+            },
+            options: {
+                responsive: true,
+                plugins: { legend: { display: false } } // ẩn legend mặc định
+            }
+        });
+
+        // Custom legend
+        const legendContainer = document.getElementById('pieLegend');
+        data.forEach((item, i) => {
+            const li = document.createElement('li');
+            li.innerHTML = `
+                <span style="display:inline-block;width:12px;height:12px;
+                             background:${colors[i % colors.length]};margin-right:6px"></span> 
+                ${item.province} (${item.count})
+            `;
+            legendContainer.appendChild(li);
+        });
+    </script>
+}

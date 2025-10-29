@@ -1,0 +1,197 @@
+﻿@using Microsoft.AspNetCore.Http
+@inject IHttpContextAccessor HttpContextAccessor
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>@ViewData["Title"] - WedNightFury</title>
+
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Font Awesome Icons -->
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" rel="stylesheet" />
+    <!-- Bi Icons -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons/font/bootstrap-icons.css" rel="stylesheet" />
+
+    <style>
+        body {
+            font-family: 'Segoe UI', sans-serif;
+            background-color: #f8f9fa;
+        }
+
+        .sidebar {
+            width: 70px;
+            height: 100vh;
+            background-color: #fff;
+            border-right: 1px solid #dee2e6;
+            position: fixed;
+            top: 0;
+            left: 0;
+            z-index: 1000;
+        }
+
+        .sidebar .logo {
+            background-color: #d9232d;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            height: 60px;
+            cursor: pointer;
+        }
+
+        .sidebar .logo img {
+            height: 36px;
+        }
+
+        .sidebar .nav-link {
+            padding: 16px 0;
+            text-align: center;
+            color: #555;
+            font-size: 18px;
+        }
+
+        .sidebar .nav-link:hover,
+        .sidebar .nav-link.active {
+            background-color: #f1f1f1;
+            color: #d9232d;
+        }
+
+        .main-content {
+            margin-left: 70px;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .topbar {
+            background-color: #fff;
+            border-bottom: 1px solid #dee2e6;
+            padding: 10px 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .search-box .input-group-text {
+            background: #fff;
+        }
+
+        footer {
+            padding: 10px 20px;
+            background: #f1f1f1;
+            font-size: 14px;
+        }
+    </style>
+</head>
+<body>
+    <div class="d-flex">
+        <!-- Sidebar -->
+        <div class="sidebar d-flex flex-column align-items-center">
+            <div class="logo w-100" id="logoReset">
+                <img src="~/images/logo.png" alt="Logo" />
+            </div>
+
+            <a class="nav-link" asp-controller="Order" asp-action="Create" data-bs-toggle="tooltip" title="Tạo đơn">
+                <i class="fas fa-plus-circle"></i>
+            </a>
+            <a class="nav-link" asp-controller="Order" asp-action="Manage" data-bs-toggle="tooltip" title="Quản lý vận đơn">
+                <i class="fas fa-box"></i>
+            </a>
+            <a class="nav-link" asp-controller="Report" asp-action="Today" data-bs-toggle="tooltip" title="Báo cáo vận hành hôm nay">
+                <i class="fas fa-calendar-day"></i>
+            </a>
+            <a class="nav-link" asp-controller="Customer" asp-action="Dashboard" data-bs-toggle="tooltip" title="Thống kê">
+                <i class="fas fa-chart-bar"></i>
+            </a>
+            <a class="nav-link" asp-controller="Order" asp-action="Pending" data-bs-toggle="tooltip" title="Đơn hàng cần xử lý">
+                <i class="fas fa-triangle-exclamation"></i>
+            </a>
+            <a class="nav-link" asp-controller="Receiver" asp-action="Index" data-bs-toggle="tooltip" title="Danh sách người nhận">
+                <i class="fas fa-users"></i>
+            </a>
+            <a class="nav-link" asp-controller="User" asp-action="Profile" data-bs-toggle="tooltip" title="Thông tin tài khoản">
+                <i class="fas fa-user-circle"></i>
+            </a>
+            <a class="nav-link" asp-controller="Faq" asp-action="Index" data-bs-toggle="tooltip" title="Câu hỏi thường gặp">
+                <i class="fas fa-question-circle"></i>
+            </a>
+            <a class="nav-link mt-auto" asp-controller="Auth" asp-action="Logout" data-bs-toggle="tooltip" title="Đăng xuất">
+                <i class="fas fa-sign-out-alt text-danger"></i>
+            </a>
+        </div>
+
+        <!-- Main content -->
+        <div class="main-content flex-grow-1">
+            <!-- Topbar -->
+            <div class="topbar">
+                <!-- Logo + Search -->
+                <div class="d-flex align-items-center" style="gap:10px;">
+                    <div class="input-group search-box">
+                        <span class="input-group-text border-end-0">
+                            <i class="fas fa-search text-muted"></i>
+                        </span>
+                        <input type="text" class="form-control border-start-0" placeholder="Tra cứu đơn hàng..." />
+                    </div>
+                </div>
+
+                <!-- User + Notification -->
+                <div class="d-flex align-items-center" style="gap:20px;">
+                    <!-- Notification -->
+                    <a href="#" class="position-relative text-decoration-none text-dark">
+                        <i class="fas fa-bell fa-lg"></i>
+                        <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger">
+                            5
+                        </span>
+                    </a>
+                    <!-- User dropdown -->
+                    <div class="dropdown">
+                        <a class="d-flex align-items-center text-dark text-decoration-none dropdown-toggle" 
+                           href="#" id="userMenu" data-bs-toggle="dropdown" aria-expanded="false">
+                            <span class="me-2 fw-bold">
+                                @(!string.IsNullOrEmpty(ViewBag.CustomerName) 
+                                    ? ViewBag.CustomerName 
+                                    : HttpContextAccessor.HttpContext.Session.GetString("UserName"))
+                            </span>
+                            <img src="~/images/avatar.png" alt="User" class="rounded-circle" width="32" height="32">
+                        </a>
+                        <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="userMenu">
+                            <li><a class="dropdown-item" asp-controller="User" asp-action="Profile">Hồ sơ</a></li>
+                            <li><a class="dropdown-item" asp-controller="Auth" asp-action="Logout">Đăng xuất</a></li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Nội dung -->
+            <main class="container-fluid py-4">
+                @RenderBody()
+            </main>
+
+            <!-- Footer -->
+            <footer class="text-muted text-center mt-auto">
+                &copy; 2025 - WedNightFury - <a asp-controller="Home" asp-action="Privacy">Chính sách</a>
+            </footer>
+        </div>
+    </div>
+
+    <!-- Scripts -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        // Kích hoạt tooltip Bootstrap
+        const tooltipTriggerList = document.querySelectorAll('[data-bs-toggle="tooltip"]')
+        const tooltipList = [...tooltipTriggerList].map(t => new bootstrap.Tooltip(t))
+
+        // Bấm logo để reload trang
+        document.addEventListener("DOMContentLoaded", function () {
+            const logo = document.getElementById("logoReset");
+            if (logo) {
+                logo.addEventListener("click", function () {
+                    location.reload();
+                });
+            }
+        });
+    </script>
+    @await RenderSectionAsync("Scripts", required: false)
+</body>
+</html>

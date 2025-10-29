@@ -1,0 +1,75 @@
+@model WedNightFury.Models.Profile
+@{
+    ViewData["Title"] = "Cài đặt tài khoản";
+}
+
+<div class="container py-4">
+    <h3 class="fw-bold text-danger mb-4">⚙️ CÀI ĐẶT TÀI KHOẢN</h3>
+
+    @if (ViewBag.Message != null)
+    {
+        <div class="alert alert-success">@ViewBag.Message</div>
+    }
+
+    <form method="post" class="card shadow-sm p-4">
+        <h5 class="mb-3 text-primary fw-bold">Thông tin tài khoản</h5>
+
+        <input type="hidden" asp-for="Id" />
+
+        <div class="row mb-3">
+            <div class="col-md-6">
+                <label class="form-label">Tên khách hàng / Công ty</label>
+                <input asp-for="FullName" class="form-control" />
+            </div>
+            <div class="col-md-6">
+                <label class="form-label">Email</label>
+                <input asp-for="Email" class="form-control" />
+            </div>
+        </div>
+
+        <div class="row mb-3">
+            <div class="col-md-6">
+                <label class="form-label">Số điện thoại</label>
+                <input asp-for="Phone" class="form-control" />
+            </div>
+            <div class="col-md-6">
+                <label class="form-label">Ngày sinh</label>
+                <input asp-for="BirthDate" type="date" class="form-control" />
+            </div>
+        </div>
+
+        <div class="mb-3">
+            <label class="form-label">Chứng minh thư / Mã số thuế</label>
+            <input asp-for="TaxCode" class="form-control" />
+        </div>
+
+        <div class="mb-3">
+            <label class="form-label">Địa chỉ thường trú / Địa chỉ xuất hóa đơn</label>
+            <input asp-for="Address" class="form-control" />
+        </div>
+
+        <div class="row mb-3">
+            <div class="col-md-4">
+                <label class="form-label">Tỉnh / Thành phố</label>
+                <input asp-for="City" class="form-control" />
+            </div>
+            <div class="col-md-4">
+                <label class="form-label">Quận / Huyện</label>
+                <input asp-for="District" class="form-control" />
+            </div>
+            <div class="col-md-4">
+                <label class="form-label">Phường / Xã</label>
+                <input asp-for="Ward" class="form-control" />
+            </div>
+        </div>
+
+        <div class="text-end">
+            <button type="submit" class="btn btn-danger px-4">💾 Lưu thay đổi</button>
+        </div>
+    </form>
+</div>
+
+<style>
+    .form-label { font-weight: 600; }
+    .card { border-radius: 12px; }
+</style>

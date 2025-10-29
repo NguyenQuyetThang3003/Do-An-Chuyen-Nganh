@@ -1,0 +1,164 @@
+@model IEnumerable<WedNightFury.Models.Order>
+@{
+    ViewData["Title"] = "Quản lý vận đơn";
+}
+
+<div class="container-fluid">
+    <h3 class="mb-4">📦 Quản lý vận đơn</h3>
+
+    <!-- Bộ lọc -->
+    <form method="get" class="row g-2 mb-4">
+        <div class="col-md-3">
+            <input type="date" name="startDate" class="form-control" />
+        </div>
+        <div class="col-md-3">
+            <input type="date" name="endDate" class="form-control" />
+        </div>
+        <div class="col-md-3">
+            <select name="status" class="form-select">
+                <option value="all">Tất cả trạng thái</option>
+                <option value="pending">Chờ xử lý</option>
+                <option value="shipping">Đang vận chuyển</option>
+                <option value="done">Hoàn tất</option>
+                <option value="cancelled">Đã hủy</option>
+            </select>
+        </div>
+        <div class="col-md-3">
+            <button type="submit" class="btn btn-primary w-100">🔍 Lọc</button>
+        </div>
+    </form>
+
+    <!-- Nút hành động -->
+    <div class="mb-3 d-flex gap-2">
+        <a href="#" class="btn btn-success">🖨 In đơn</a>
+        <a href="#" class="btn btn-outline-success">⬇ Xuất Excel</a>
+        <a href="#" class="btn btn-outline-secondary">⬆ Nhập Excel</a>
+    </div>
+
+    <!-- Thông báo -->
+    @if (TempData["Message"] != null)
+    {
+        <div class="alert alert-success">@TempData["Message"]</div>
+    }
+
+    <!-- Thống kê -->
+    <div class="row text-center mb-4">
+        <div class="col-md-2">
+            <div class="card bg-light p-2">
+                <h6>Tổng số đơn</h6>
+                <h4>@ViewBag.TotalOrders</h4>
+            </div>
+        </div>
+        <div class="col-md-2">
+            <div class="card p-2 bg-info text-white">
+                <h6>Chờ xử lý</h6>
+                <h4>@ViewBag.PendingOrders</h4>
+            </div>
+        </div>
+        <div class="col-md-2">
+            <div class="card p-2 bg-warning text-dark">
+                <h6>Đang vận chuyển</h6>
+                <h4>@ViewBag.ShippingOrders</h4>
+            </div>
+        </div>
+        <div class="col-md-2">
+            <div class="card p-2 bg-success text-white">
+                <h6>Hoàn tất</h6>
+                <h4>@ViewBag.DoneOrders</h4>
+            </div>
+        </div>
+        <div class="col-md-2">
+            <div class="card p-2 bg-danger text-white">
+                <h6>Đã hủy</h6>
+                <h4>@ViewBag.CancelledOrders</h4>
+            </div>
+        </div>
+    </div>
+
+    <!-- Bảng danh sách -->
+    <div class="table-responsive">
+        <table class="table table-bordered table-hover align-middle">
+            <thead class="table-light">
+                <tr>
+                    <th>#</th>
+                    <th>Người gửi</th>
+                    <th>Người nhận</th>
+                    <th>Giá trị (VNĐ)</th>
+                    <th>Trạng thái</th>
+                    <th>Ngày tạo</th>
+                    <th>Thao tác</th>
+                </tr>
+            </thead>
+            <tbody>
+                @if (!Model.Any())
+                {
+                    <tr><td colspan="7" class="text-center text-muted">Không có đơn hàng nào</td></tr>
+                }
+                else
+                {
+                    foreach (var o in Model)
+                    {
+                        <tr>
+                            <td><b>@o.Id</b></td>
+                            <td>@o.SenderName</td>
+                            <td>@o.ReceiverName</td>
+                            <td>@String.Format("{0:N0}", o.Value)</td>
+                            <td>
+                                @switch (o.Status)
+                                {
+                                    case "pending":
+                                        <span class="badge bg-info">Chờ xử lý</span>; break;
+                                    case "shipping":
+                                        <span class="badge bg-warning text-dark">Đang giao</span>; break;
+                                    case "done":
+                                        <span class="badge bg-success">Hoàn tất</span>; break;
+                                    case "cancelled":
+                                        <span class="badge bg-danger">Đã hủy</span>; break;
+                                }
+                            </td>
+                            <td>
+                                @(o.CreatedAt.HasValue 
+                                    ? o.CreatedAt.Value.ToString("dd/MM/yyyy HH:mm") 
+                                    : "")
+                            </td>
+                            <td>
+                                <div class="btn-group" role="group">
+                                    <a asp-action="Details" asp-route-id="@o.Id" class="btn btn-sm btn-outline-primary">Xem</a>
+                                    <a asp-action="Print" asp-route-id="@o.Id" class="btn btn-sm btn-outline-success">In</a>
+                                    <form asp-action="UpdateStatus" method="post" class="d-inline">
+                                        <input type="hidden" name="id" value="@o.Id" />
+                                        <select name="newStatus" class="form-select form-select-sm d-inline w-auto"
+                                                onchange="this.form.submit()">
+                                            <option disabled selected>Trạng thái</option>
+                                            <option value="pending">Chờ xử lý</option>
+                                            <option value="shipping">Đang giao</option>
+                                            <option value="done">Hoàn tất</option>
+                                            <option value="cancelled">Đã hủy</option>
+                                        </select>
+                                    </form>
+                                </div>
+                            </td>
+                        </tr>
+                    }
+                }
+            </tbody>
+        </table>
+    </div>
+</div>
+
+<style>
+    .badge {
+        font-size: 0.9rem;
+        padding: 6px 10px;
+    }
+
+    select.form-select-sm {
+        font-size: 0.85rem;
+        height: 30px;
+        padding: 0 4px;
+    }
+
+    .btn-group .btn {
+        margin-right: 3px;
+    }
+</style>

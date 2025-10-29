@@ -1,0 +1,126 @@
+@model WedNightFury.Models.Order
+@{
+    ViewData["Title"] = "Chi tiết đơn hàng";
+}
+
+<div class="container py-4">
+    <h3 class="mb-4 text-danger fw-bold">📦 Thông tin đơn hàng #@Model.Id</h3>
+
+    <div class="row">
+        <!-- ====== Cột trái ====== -->
+        <div class="col-md-6">
+            <!-- Thông tin đơn -->
+            <div class="card mb-3 shadow-sm">
+                <div class="card-header bg-light fw-bold">Thông tin đơn</div>
+                <div class="card-body">
+                    <p><strong>Mã đơn hàng:</strong> 12300@Model.Id</p>
+                    <p>
+                        <strong>Ngày tạo:</strong> @(Model.CreatedAt?.ToString("dd/MM/yyyy HH:mm") ?? "Chưa có")
+                    </p>
+                    <p><strong>Trạng thái:</strong>
+                        @switch (Model.Status)
+                        {
+                            case "pending":
+                                <span class="badge bg-info">Chờ xử lý</span>; break;
+                            case "shipping":
+                                <span class="badge bg-warning text-dark">Đang vận chuyển</span>; break;
+                            case "done":
+                                <span class="badge bg-success">Hoàn tất</span>; break;
+                            case "cancelled":
+                                <span class="badge bg-danger">Đã hủy</span>; break;
+                            default:
+                                <span class="badge bg-secondary">Không xác định</span>; break;
+                        }
+                    </p>
+                    <p><strong>Trạng thái thanh toán COD:</strong>
+                        <span class="text-danger fw-bold">Chưa đối soát COD</span>
+                    </p>
+                    <p><strong>Ghi chú:</strong> @(!string.IsNullOrEmpty(Model.Note) ? Model.Note : "Không có")</p>
+                </div>
+            </div>
+
+            <!-- Người gửi -->
+            <div class="card mb-3 shadow-sm">
+                <div class="card-header bg-light fw-bold">Người gửi</div>
+                <div class="card-body">
+                    <p><strong>Họ tên:</strong> @Model.SenderName</p>
+                    <p><strong>Số điện thoại:</strong> @Model.SenderPhone</p>
+                    <p><strong>Địa chỉ:</strong> @Model.SenderAddress</p>
+                </div>
+            </div>
+
+            <!-- Người nhận -->
+            <div class="card mb-3 shadow-sm">
+                <div class="card-header bg-light fw-bold">Người nhận</div>
+                <div class="card-body">
+                    <p><strong>Họ tên:</strong> @Model.ReceiverName</p>
+                    <p><strong>Số điện thoại:</strong> @Model.ReceiverPhone</p>
+                    <p><strong>Địa chỉ:</strong> @Model.ReceiverAddress</p>
+                    <p><strong>Tỉnh/Thành phố:</strong> @Model.Province</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- ====== Cột phải ====== -->
+        <div class="col-md-6">
+            <!-- Thông tin hàng hóa -->
+            <div class="card mb-3 shadow-sm">
+                <div class="card-header bg-light fw-bold">Thông tin hàng hóa</div>
+                <div class="card-body">
+                    <p><strong>Tên hàng:</strong> @Model.ProductName</p>
+                    <p><strong>Trọng lượng:</strong> @Model.Weight gram</p>
+                    <p><strong>Giá trị:</strong> @String.Format("{0:N0}", Model.Value) VNĐ</p>
+                    <p><strong>Ghi chú thêm:</strong> @(!string.IsNullOrEmpty(Model.Note) ? Model.Note : "Không có")</p>
+                    <hr />
+                    <p><strong>Phí vận chuyển:</strong> <span class="text-danger fw-bold">23.000 đ</span></p>
+                    <p><strong>Người trả phí:</strong> Người nhận</p>
+                </div>
+            </div>
+
+            <!-- Hành trình đơn -->
+            <div class="card mb-3 shadow-sm">
+                <div class="card-header bg-light fw-bold">Hành trình đơn</div>
+                <div class="card-body">
+                    <ul class="timeline list-unstyled">
+                        <li><i class="bi bi-circle-fill text-success me-2"></i>Đã tạo đơn hàng lúc @Model.CreatedAt?.ToString("dd/MM/yyyy HH:mm")</li>
+                        @if (Model.Status == "shipping")
+                        {
+                            <li><i class="bi bi-truck text-primary me-2"></i>Đang giao hàng</li>
+                        }
+                        else if (Model.Status == "done")
+                        {
+                            <li><i class="bi bi-check-circle text-success me-2"></i>Đã giao thành công</li>
+                        }
+                        else if (Model.Status == "cancelled")
+                        {
+                            <li><i class="bi bi-x-circle text-danger me-2"></i>Đơn hàng đã bị hủy</li>
+                        }
+                        else
+                        {
+                            <li><i class="bi bi-hourglass-split text-warning me-2"></i>Đang chờ xử lý</li>
+                        }
+                    </ul>
+                </div>
+            </div>
+
+            <!-- Nút thao tác -->
+            <div class="d-flex gap-2 mt-3">
+                <a asp-action="Manage" class="btn btn-secondary"><i class="bi bi-arrow-left"></i> Quay lại</a>
+                <a asp-action="Print" asp-route-id="@Model.Id" class="btn btn-success"><i class="bi bi-printer"></i> In đơn</a>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+    .timeline li {
+        margin-bottom: 8px;
+        font-size: 0.95rem;
+    }
+    .card {
+        border-radius: 10px;
+    }
+    .card-header {
+        font-size: 1rem;
+    }
+</style>

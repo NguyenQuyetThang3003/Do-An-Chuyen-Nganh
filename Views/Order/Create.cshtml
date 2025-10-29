@@ -1,0 +1,239 @@
+@model WedNightFury.Models.Order
+@{
+    ViewData["Title"] = "Tạo đơn hàng - NightFury Express";
+}
+
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet" />
+<link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css" rel="stylesheet" />
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
+<style>
+    body {
+        background-color: #f5f7fa;
+    }
+
+    .card-section {
+        background: #fff;
+        border-radius: 10px;
+        padding: 25px;
+        margin-bottom: 25px;
+        box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+    }
+
+    .card-section h5 {
+        color: #d32f2f;
+        font-weight: 700;
+        border-bottom: 2px solid #f1f1f1;
+        padding-bottom: 8px;
+        margin-bottom: 20px;
+    }
+
+    label {
+        font-weight: 600;
+        font-size: 0.9rem;
+    }
+
+    .btn-danger {
+        background-color: #d32f2f;
+        border-color: #d32f2f;
+    }
+
+    .btn-danger:hover {
+        background-color: #b71c1c;
+    }
+</style>
+
+<div class="container py-5">
+    <h2 class="text-center text-danger fw-bold mb-4">
+        <i class="bi bi-truck"></i> TẠO ĐƠN HÀNG NIGHTFURY
+    </h2>
+
+    <form asp-action="Create" method="post">
+        <!-- NGƯỜI GỬI -->
+        <div class="card-section">
+            <h5><i class="bi bi-person-fill"></i> NGƯỜI GỬI</h5>
+            <div class="row g-3">
+                <div class="col-md-6">
+                    <label asp-for="SenderName">Tên người gửi</label>
+                    <input asp-for="SenderName" class="form-control" placeholder="VD: Nguyễn Văn A" />
+                </div>
+                <div class="col-md-6">
+                    <label asp-for="SenderPhone">Số điện thoại</label>
+                    <input asp-for="SenderPhone" class="form-control" placeholder="VD: 0909123456" />
+                </div>
+                <div class="col-md-12">
+                    <label asp-for="SenderAddress">Địa chỉ gửi hàng</label>
+                    <input asp-for="SenderAddress" class="form-control" placeholder="Số nhà, đường, phường, quận..." />
+                </div>
+                <div class="col-md-4">
+                    <label>Thời gian hẹn lấy</label>
+                    <input type="datetime-local" class="form-control" />
+                </div>
+            </div>
+        </div>
+
+        <!-- NGƯỜI NHẬN -->
+        <div class="card-section">
+            <h5><i class="bi bi-person-lines-fill"></i> NGƯỜI NHẬN</h5>
+            <div class="row g-3">
+                <div class="col-md-4">
+                    <label asp-for="ReceiverName">Tên người nhận</label>
+                    <input asp-for="ReceiverName" class="form-control" placeholder="VD: Trần Thị B" />
+                </div>
+                <div class="col-md-4">
+                    <label asp-for="ReceiverPhone">Số điện thoại</label>
+                    <input asp-for="ReceiverPhone" class="form-control" placeholder="VD: 0987654321" />
+                </div>
+                <div class="col-md-4">
+                    <label asp-for="Province">Tỉnh/Thành phố</label>
+                    <input asp-for="Province" class="form-control" placeholder="VD: TP. Hồ Chí Minh" />
+                </div>
+                <div class="col-md-12">
+                    <label asp-for="ReceiverAddress">Địa chỉ chi tiết</label>
+                    <input asp-for="ReceiverAddress" class="form-control" placeholder="Số nhà, đường, phường, quận..." />
+                </div>
+
+                <div class="col-md-12 mt-2">
+                    <label class="fw-bold">Tùy chọn nơi nhận</label>
+                    <div class="form-check form-check-inline ms-3">
+                        <input class="form-check-input" type="radio" name="receiveType" checked>
+                        <label class="form-check-label">Theo địa chỉ KH nhận</label>
+                    </div>
+                    <div class="form-check form-check-inline">
+                        <input class="form-check-input" type="radio" name="receiveType">
+                        <label class="form-check-label">Nhận tại bưu cục</label>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- THÔNG TIN HÀNG HÓA -->
+        <div class="card-section">
+            <h5><i class="bi bi-box-seam"></i> THÔNG TIN HÀNG HÓA</h5>
+            <div class="row g-3">
+                <div class="col-md-4">
+                    <label asp-for="ProductName">Tên hàng hóa</label>
+                    <input asp-for="ProductName" class="form-control" placeholder="VD: Giày, áo, sách..." />
+                </div>
+                <div class="col-md-2">
+                    <label asp-for="Weight">Trọng lượng (gram)</label>
+                    <input asp-for="Weight" type="number" class="form-control" />
+                </div>
+                <div class="col-md-3">
+                    <label asp-for="Value">Giá trị (VNĐ)</label>
+                    <input asp-for="Value" type="number" class="form-control" />
+                </div>
+                <div class="col-md-3">
+                    <label>Số lượng</label>
+                    <input type="number" class="form-control" value="1" />
+                </div>
+            </div>
+
+            <div class="row g-3 mt-3">
+                <div class="col-md-12">
+                    <label>Tính chất hàng hóa đặc biệt:</label><br />
+                    <div class="form-check form-check-inline">
+                        <input class="form-check-input" type="checkbox" />
+                        <label class="form-check-label">Giá trị cao</label>
+                    </div>
+                    <div class="form-check form-check-inline">
+                        <input class="form-check-input" type="checkbox" />
+                        <label class="form-check-label">Dễ vỡ</label>
+                    </div>
+                    <div class="form-check form-check-inline">
+                        <input class="form-check-input" type="checkbox" />
+                        <label class="form-check-label">Chất lỏng</label>
+                    </div>
+                    <div class="form-check form-check-inline">
+                        <input class="form-check-input" type="checkbox" />
+                        <label class="form-check-label">Từ tính / Pin</label>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <label>Kích thước (Dài cm)</label>
+                    <input type="number" class="form-control" />
+                </div>
+                <div class="col-md-4">
+                    <label>Rộng (cm)</label>
+                    <input type="number" class="form-control" />
+                </div>
+                <div class="col-md-4">
+                    <label>Cao (cm)</label>
+                    <input type="number" class="form-control" />
+                </div>
+            </div>
+        </div>
+
+        <!-- THANH TOÁN & GHI CHÚ -->
+        <div class="card-section">
+            <h5><i class="bi bi-cash-coin"></i> THANH TOÁN & GHI CHÚ</h5>
+            <div class="row g-3">
+                <div class="col-md-4">
+                    <label>Tiền thu hộ (COD)</label>
+                    <input type="number" class="form-control" placeholder="VD: 150000" />
+                </div>
+                <div class="col-md-4">
+                    <label>Người trả cước</label><br />
+                    <div class="form-check form-check-inline">
+                        <input class="form-check-input" type="radio" name="payer" checked>
+                        <label class="form-check-label">Người gửi</label>
+                    </div>
+                    <div class="form-check form-check-inline">
+                        <input class="form-check-input" type="radio" name="payer">
+                        <label class="form-check-label">Người nhận</label>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <label>Khuyến mãi</label>
+                    <select class="form-select">
+                        <option selected>Chọn mã khuyến mãi</option>
+                        <option>FREESHIP50</option>
+                        <option>SALE10</option>
+                    </select>
+                </div>
+                <div class="col-md-12">
+                    <label asp-for="Note">Ghi chú</label>
+                    <textarea asp-for="Note" class="form-control" rows="3" placeholder="Giao giờ hành chính, gọi trước khi giao..."></textarea>
+                </div>
+            </div>
+        </div>
+
+        <!-- NÚT GỬI -->
+        <div class="text-center mt-4">
+            <button type="submit" class="btn btn-danger btn-lg px-5 me-3">
+                <i class="bi bi-send"></i> GỬI NGAY
+            </button>
+            <button type="reset" class="btn btn-secondary btn-lg px-5 me-3">LÀM MỚI</button>
+            <button type="button" class="btn btn-outline-danger btn-lg px-5">LƯU NHÁP</button>
+        </div>
+    </form>
+</div>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+
+    @* Popup SweetAlert sau khi tạo đơn thành công *@
+    @if (TempData["OrderCode"] != null)
+    {
+        <script>
+            Swal.fire({
+                icon: 'success',
+                title: 'Tạo đơn thành công',
+                html: `Tạo và gửi duyệt thành công đơn hàng: 
+                       <b>@TempData["OrderCode"]</b><br/><br/>
+                       <div>
+                           <label>Số liên cần in:</label><br/>
+                           <input type="radio" checked> 1 liên
+                           <input type="radio"> 2 liên
+                       </div>
+                       <div class='mt-3'>
+                           <button class='btn btn-danger me-2'>In A5</button>
+                           <button class='btn btn-outline-danger me-2'>In nhiệt A6</button>
+                           <button class='btn btn-outline-secondary'>In A7</button>
+                       </div>`,
+                confirmButtonText: 'Đóng',
+                confirmButtonColor: '#d32f2f'
+            })
+        </script>
+    }
+}
