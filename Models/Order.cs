@@ -15,6 +15,11 @@ namespace WedNightFury.Models
         public int? CustomerId { get; set; }
         public virtual User? User { get; set; }
 
+        // ✅ Mã đơn hàng để tracking / barcode
+        [StringLength(50)]
+        [Column("code")]
+        public string? Code { get; set; }
+
         // ======= Người gửi =======
         [StringLength(100)]
         public string? SenderName { get; set; }

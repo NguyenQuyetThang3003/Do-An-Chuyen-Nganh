@@ -1,0 +1,157 @@
+@model IEnumerable<WedNightFury.Models.Order>
+
+@{
+    ViewData["Title"] = "Đơn hàng cần xử lý";
+}
+
+<div class="container mt-4">
+    <h3 class="fw-bold text-danger mb-3">📋 Đơn hàng cần xử lý</h3>
+
+    <form method="get" class="row g-2 mb-3">
+        <div class="col-md-3">
+            <input type="date" class="form-control" name="startDate" value="@ViewBag.StartDate" />
+        </div>
+        <div class="col-md-3">
+            <input type="date" class="form-control" name="endDate" value="@ViewBag.EndDate" />
+        </div>
+        <div class="col-md-2">
+            <button type="submit" class="btn btn-danger w-100">🔍 Lọc</button>
+        </div>
+    </form>
+
+    @if (TempData["Message"] != null)
+    {
+        <div class="alert alert-success text-center">@TempData["Message"]</div>
+    }
+
+    @if (Model.Any())
+    {
+        <table class="table table-bordered table-hover align-middle shadow-sm">
+            <thead class="table-light text-center">
+                <tr>
+                    <th>Mã đơn</th>
+                    <th>Ngày tạo</th>
+                    <th>Người nhận</th>
+                    <th>Địa chỉ</th>
+                    <th>Hàng hóa</th>
+                    <th>Trạng thái</th>
+                    <th>Thao tác</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var order in Model)
+                {
+                    <tr>
+                        <td class="text-center fw-bold">#@order.Id</td>
+                        <td>@order.CreatedAt?.ToString("dd/MM/yyyy HH:mm")</td>
+                        <td>@order.ReceiverName</td>
+                        <td>@order.ReceiverAddress</td>
+                        <td>@order.ProductName</td>
+                        <td class="text-center">
+                            @if (order.Status == "pending")
+                            {
+                                <span class="badge bg-warning text-dark">Chờ xử lý</span>
+                            }
+                            else if (order.Status == "shipping")
+                            {
+                                <span class="badge bg-primary">Đang giao</span>
+                            }
+                            else
+                            {
+                                <span class="badge bg-secondary">Khác</span>
+                            }
+                        </td>
+                        <td class="text-center">
+                            @if (order.Status == "pending")
+                            {
+                                <button type="button" class="btn btn-success btn-sm"
+                                        onclick="confirmAction('@order.Id', 'shipping', 'Xác nhận duyệt đơn này?')">
+                                    ✅ Đồng ý
+                                </button>
+                                <button type="button" class="btn btn-danger btn-sm"
+                                        onclick="confirmAction('@order.Id', 'cancelled', 'Bạn có chắc muốn hủy đơn này?')">
+                                    ❌ Từ chối
+                                </button>
+                            }
+                            else if (order.Status == "shipping")
+                            {
+                                <button type="button" class="btn btn-primary btn-sm"
+                                        onclick="confirmAction('@order.Id', 'done', 'Xác nhận hoàn tất đơn hàng này?')">
+                                    ✅ Hoàn tất
+                                </button>
+                            }
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    }
+    else
+    {
+        <div class="alert alert-info text-center mt-3">
+            Không có đơn hàng nào cần xử lý.
+        </div>
+    }
+</div>
+
+<!-- Modal xác nhận -->
+<div class="modal fade" id="confirmModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header bg-danger text-white">
+                <h5 class="modal-title">Xác nhận hành động</h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body text-center">
+                <p id="confirmText" class="fw-bold"></p>
+            </div>
+            <div class="modal-footer justify-content-center">
+                <form id="confirmForm" method="post" asp-action="ChangeStatus">
+                    <input type="hidden" id="confirmId" name="id" />
+                    <input type="hidden" id="confirmStatus" name="newStatus" />
+                    <button type="submit" class="btn btn-success px-4">Xác nhận</button>
+                    <button type="button" class="btn btn-secondary px-4" data-bs-dismiss="modal">Hủy</button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        function confirmAction(id, status, message) {
+            document.getElementById('confirmId').value = id;
+            document.getElementById('confirmStatus').value = status;
+            document.getElementById('confirmText').textContent = message;
+
+            var modal = new bootstrap.Modal(document.getElementById('confirmModal'));
+            modal.show();
+        }
+    </script>
+}
+
+<style>
+    table {
+        border-radius: 8px;
+        overflow: hidden;
+    }
+
+    .badge {
+        font-size: 0.9rem;
+        padding: 6px 10px;
+    }
+
+    .btn-sm {
+        font-size: 0.85rem;
+        margin: 2px;
+        min-width: 85px;
+    }
+
+    .alert {
+        border-radius: 10px;
+    }
+
+    h3 {
+        font-family: 'Segoe UI', sans-serif;
+    }
+</style>

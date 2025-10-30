@@ -8,7 +8,6 @@ namespace WedNightFury.Models
 
         public DbSet<User> Users { get; set; }
         public DbSet<Order> Orders { get; set; }
-
         public DbSet<Payment> Payments { get; set; }
         public DbSet<Rating> Ratings { get; set; }
         public DbSet<Profile> Profiles { get; set; }

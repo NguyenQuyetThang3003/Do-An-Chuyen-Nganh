@@ -165,7 +165,6 @@ C:\laragon\www\WedNightFury\WedNightFury\obj\Debug\net9.0\WedNightFury.RazorAsse
 C:\laragon\www\WedNightFury\WedNightFury\obj\Debug\net9.0\scopedcss\Views\Shared\_Layout.cshtml.rz.scp.css
 C:\laragon\www\WedNightFury\WedNightFury\obj\Debug\net9.0\scopedcss\bundle\WedNightFury.styles.css
 C:\laragon\www\WedNightFury\WedNightFury\obj\Debug\net9.0\scopedcss\projectbundle\WedNightFury.bundle.scp.css
-C:\laragon\www\WedNightFury\WedNightFury\obj\Debug\net9.0\compressed\klo7s16exw-b9sayid5wm.gz
 C:\laragon\www\WedNightFury\WedNightFury\obj\Debug\net9.0\compressed\r32t7i5xxr-61n19gt1b8.gz
 C:\laragon\www\WedNightFury\WedNightFury\obj\Debug\net9.0\compressed\lc69y0wu1i-xtxxf3hu2r.gz
 C:\laragon\www\WedNightFury\WedNightFury\obj\Debug\net9.0\compressed\0wboelso7y-bqjiyaj88i.gz
@@ -244,3 +243,5 @@ C:\laragon\www\WedNightFury\WedNightFury\obj\Debug\net9.0\refint\WedNightFury.dl
 C:\laragon\www\WedNightFury\WedNightFury\obj\Debug\net9.0\WedNightFury.pdb
 C:\laragon\www\WedNightFury\WedNightFury\obj\Debug\net9.0\WedNightFury.genruntimeconfig.cache
 C:\laragon\www\WedNightFury\WedNightFury\obj\Debug\net9.0\ref\WedNightFury.dll
+C:\laragon\www\WedNightFury\WedNightFury\obj\Debug\net9.0\WedNightFury.sourcelink.json
+C:\laragon\www\WedNightFury\WedNightFury\obj\Debug\net9.0\compressed\klo7s16exw-0h28gm5wmb.gz

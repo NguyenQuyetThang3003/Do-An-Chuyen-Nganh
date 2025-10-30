@@ -81,18 +81,20 @@
             <thead class="table-light">
                 <tr>
                     <th>#</th>
+                    <th>Mã đơn</th>
                     <th>Người gửi</th>
                     <th>Người nhận</th>
                     <th>Giá trị (VNĐ)</th>
                     <th>Trạng thái</th>
                     <th>Ngày tạo</th>
+                    <th>Đánh giá</th>
                     <th>Thao tác</th>
                 </tr>
             </thead>
             <tbody>
                 @if (!Model.Any())
                 {
-                    <tr><td colspan="7" class="text-center text-muted">Không có đơn hàng nào</td></tr>
+                    <tr><td colspan="9" class="text-center text-muted">Không có đơn hàng nào</td></tr>
                 }
                 else
                 {
@@ -100,6 +102,22 @@
                     {
                         <tr>
                             <td><b>@o.Id</b></td>
+                            <td>
+                                @if (!string.IsNullOrEmpty(o.Code))
+                                {
+                                    <div class="d-flex align-items-center justify-content-between" style="gap:5px;">
+                                        <span class="text-primary fw-bold">@o.Code</span>
+                                        <button type="button" class="btn btn-sm btn-light border"
+                                                onclick="copyCode('@o.Code')" title="Sao chép mã">
+                                            <i class="fas fa-copy"></i>
+                                        </button>
+                                    </div>
+                                }
+                                else
+                                {
+                                    <span class="text-muted fst-italic">Chưa có</span>
+                                }
+                            </td>
                             <td>@o.SenderName</td>
                             <td>@o.ReceiverName</td>
                             <td>@String.Format("{0:N0}", o.Value)</td>
@@ -116,15 +134,29 @@
                                         <span class="badge bg-danger">Đã hủy</span>; break;
                                 }
                             </td>
+                            <td>@(o.CreatedAt?.ToString("dd/MM/yyyy HH:mm"))</td>
+
+                            <!-- Cột đánh giá -->
                             <td>
-                                @(o.CreatedAt.HasValue 
-                                    ? o.CreatedAt.Value.ToString("dd/MM/yyyy HH:mm") 
-                                    : "")
+                                @if (o.Status == "done")
+                                {
+                                    <a asp-controller="Rating" asp-action="Create" asp-route-orderId="@o.Id"
+                                       class="btn btn-sm btn-outline-warning">
+                                        ⭐ Đánh giá
+                                    </a>
+                                }
+                                else
+                                {
+                                    <span class="text-muted">—</span>
+                                }
                             </td>
+
+                            <!-- Cột thao tác -->
                             <td>
                                 <div class="btn-group" role="group">
                                     <a asp-action="Details" asp-route-id="@o.Id" class="btn btn-sm btn-outline-primary">Xem</a>
                                     <a asp-action="Print" asp-route-id="@o.Id" class="btn btn-sm btn-outline-success">In</a>
+
                                     <form asp-action="UpdateStatus" method="post" class="d-inline">
                                         <input type="hidden" name="id" value="@o.Id" />
                                         <select name="newStatus" class="form-select form-select-sm d-inline w-auto"
@@ -146,6 +178,7 @@
     </div>
 </div>
 
+<!-- ====== STYLE ====== -->
 <style>
     .badge {
         font-size: 0.9rem;
@@ -161,4 +194,32 @@
     .btn-group .btn {
         margin-right: 3px;
     }
+
+    .table td, .table th {
+        vertical-align: middle;
+    }
+
+    /* Toast copy animation */
+    .alert {
+        animation: fadeInOut 2.5s ease forwards;
+    }
+
+    @@keyframes fadeInOut {
+        0% { opacity: 0; transform: translateY(10px); }
+        10% { opacity: 1; transform: translateY(0); }
+        90% { opacity: 1; transform: translateY(0); }
+        100% { opacity: 0; transform: translateY(10px); }
+    }
 </style>
+
+<!-- ====== SCRIPT ====== -->
+<script>
+    function copyCode(code) {
+        navigator.clipboard.writeText(code);
+        const toast = document.createElement("div");
+        toast.className = "position-fixed bottom-0 end-0 m-3 alert alert-success py-2 px-3 shadow";
+        toast.textContent = "📋 Đã sao chép mã: " + code;
+        document.body.appendChild(toast);
+        setTimeout(() => toast.remove(), 2500);
+    }
+</script>
